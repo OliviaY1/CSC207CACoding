@@ -7,10 +7,14 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.login_cancel.CancelController;
+import interface_adapter.login_cancel.CancelPresenter;
+import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginUserDataAccessInterface;
+import use_case.login_cancel.CancelInteractor;
 import view.LoginView;
 
 import javax.swing.*;
@@ -25,11 +29,13 @@ public class LoginUseCaseFactory {
             ViewManagerModel viewManagerModel,
             LoginViewModel loginViewModel,
             LoggedInViewModel loggedInViewModel,
+            SignupViewModel signupViewModel,
             LoginUserDataAccessInterface userDataAccessObject) {
 
         try {
             LoginController loginController = createLoginUseCase(viewManagerModel, loginViewModel, loggedInViewModel, userDataAccessObject);
-            return new LoginView(loginViewModel, loginController);
+            CancelController cancelController = createCancelUseCase(viewManagerModel, signupViewModel);
+            return new LoginView(loginViewModel, loginController, cancelController);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Could not open user data file.");
         }
@@ -52,5 +58,13 @@ public class LoginUseCaseFactory {
                 userDataAccessObject, loginOutputBoundary);
 
         return new LoginController(loginInteractor);
+    }
+    public static CancelController createCancelUseCase(ViewManagerModel viewManagerModel, SignupViewModel signupViewModel){
+        // create presenter
+        CancelPresenter a = new CancelPresenter(viewManagerModel, signupViewModel);
+        // create interactor
+        CancelInteractor b = new CancelInteractor(a);
+
+        return new CancelController(b);
     }
 }

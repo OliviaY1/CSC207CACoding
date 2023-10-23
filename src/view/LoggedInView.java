@@ -51,6 +51,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
      * React to a button click that results in evt.
      */
     public void actionPerformed(ActionEvent evt) {
+        //todo: called looged out controller
+        loggedOutController.execute();
+
         System.out.println("Click " + evt.getActionCommand());
     }
 

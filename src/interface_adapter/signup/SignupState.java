@@ -77,4 +77,12 @@ public class SignupState {
                 ", repeatPassword='" + repeatPassword + '\'' +
                 '}';
     }
+    public void reset(){
+        this.username = "";
+        this.usernameError = null;
+        this.password = "";
+        this.passwordError = null;
+        this.repeatPassword = "";
+        this.repeatPasswordError = null;
+    }
 }

@@ -1,23 +1,28 @@
 package data_access;
 
+import entity.CommonUserFactory;
 import entity.User;
 import entity.UserFactory;
+import use_case.clear_users.ClearUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
-public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface {
+public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface, ClearUserDataAccessInterface {
 
     private final File csvFile;
 
     private final Map<String, Integer> headers = new LinkedHashMap<>();
 
     private final Map<String, User> accounts = new HashMap<>();
+    private List<String> deletedUsers;
 
     private UserFactory userFactory;
 
@@ -56,6 +61,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
     @Override
     public void save(User user) {
         accounts.put(user.getName(), user);
+        // 当signup interactor 创造新账号的时候都会重新从头写一遍csv file
         this.save();
     }
 
@@ -67,6 +73,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
     private void save() {
         BufferedWriter writer;
         try {
+            //fixme: no this? but it's non-static.
             writer = new BufferedWriter(new FileWriter(csvFile));
             writer.write(String.join(",", headers.keySet()));
             writer.newLine();
@@ -85,6 +92,33 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
         }
     }
 
+    public void delete(){
+        // iterate through all account, delete User and also csvFile data
+        // create a list to store accounts number
+        List<String> userNames = new ArrayList<String>();
+        for (String userName: accounts.keySet()){
+            userNames.add(userName);
+        }
+        deletedUsers = userNames;
+        // todo: empty csv file
+
+        try {
+            //fixme: no this? but it's non-static.
+            BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile));
+            writer.write(String.join(",", headers.keySet()));
+            writer.newLine();
+            writer.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (String name: userNames){
+            // store userName, gonna pass it to presenter
+            accounts.remove(name);
+        }
+    }
+    public List<String> getDeletedUsers(){return deletedUsers;}
 
     /**
      * Return whether a user exists with username identifier.
@@ -95,5 +129,5 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
     public boolean existsByName(String identifier) {
         return accounts.containsKey(identifier);
     }
-
+    public boolean isEmpty(){return accounts.size() == 0;}
 }

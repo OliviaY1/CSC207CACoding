@@ -4,6 +4,7 @@ import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupState;
+import interface_adapter.login_cancel.CancelController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,10 +29,12 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     final JButton logIn;
     final JButton cancel;
     private final LoginController loginController;
+    private final CancelController cancelController;
 
-    public LoginView(LoginViewModel loginViewModel, LoginController controller) {
+    public LoginView(LoginViewModel loginViewModel, LoginController controller, CancelController cancelController) {
 
         this.loginController = controller;
+        this.cancelController = cancelController;
         this.loginViewModel = loginViewModel;
         this.loginViewModel.addPropertyChangeListener(this);
 
@@ -114,7 +117,11 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
      * React to a button click that results in evt.
      */
     public void actionPerformed(ActionEvent evt) {
-        System.out.println("Click " + evt.getActionCommand());
+        if (evt.getSource().equals(cancel)) {
+            System.out.println("Click " + evt.getActionCommand());
+            //todo: change to signup view model
+            cancelController.execute();
+        }
     }
 
     @Override
