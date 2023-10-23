@@ -2,11 +2,14 @@ package app;
 
 import data_access.FileUserDataAccessObject;
 import entity.CommonUserFactory;
+import interface_adapter.logged_out.LoggedOutController;
+import interface_adapter.logged_out.LoggedOutPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.signup.SignupViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.clear_users.ClearViewModel;
+import use_case.logged_out.LoggedOutInteractor;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
@@ -57,7 +60,11 @@ public class Main {
         LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel, loggedInViewModel, signupViewModel,userDataAccessObject);
         views.add(loginView, loginView.viewName);
 
-        LoggedInView loggedInView = new LoggedInView(loggedInViewModel);
+        LoggedOutPresenter presenter = new LoggedOutPresenter(viewManagerModel, loginViewModel);
+        LoggedOutInteractor interactor = new LoggedOutInteractor(presenter);
+        LoggedOutController a = new LoggedOutController(interactor);
+
+        LoggedInView loggedInView = new LoggedInView(loggedInViewModel, a);
         views.add(loggedInView, loggedInView.viewName);
 
         viewManagerModel.setActiveView(signupView.viewName);
